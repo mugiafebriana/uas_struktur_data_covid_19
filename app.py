@@ -1,12 +1,11 @@
 import streamlit as st
 import pandas as pd
-from sklearn.tree import DecisionTreeClassifier, plot_tree
-import matplotlib.pyplot as plt
+from sklearn.tree import DecisionTreeClassifier
 
-st.set_page_config(page_title="Diagnosa COVID-19", layout="wide")
+st.set_page_config(page_title="Deteksi COVID-19", layout="centered")
 
-st.title("🦠 Diagnosa COVID-19 - Decision Tree")
-st.write("UAS Struktur Data")
+st.title("🦠 Deteksi COVID-19")
+st.write("Aplikasi sederhana deteksi COVID-19 menggunakan Decision Tree")
 
 # ======================
 # DATASET (11 DATA)
@@ -27,15 +26,12 @@ data = {
 
 df = pd.DataFrame(data)
 
-st.subheader("📊 Tabel Data Sample (11 Data)")
-st.dataframe(df)
-
-# ======================
-# MODEL DECISION TREE
-# ======================
 X = df.drop('Status_Covid', axis=1)
 y = df['Status_Covid']
 
+# ======================
+# MODEL
+# ======================
 model = DecisionTreeClassifier(
     criterion="gini",
     max_depth=4,
@@ -44,43 +40,18 @@ model = DecisionTreeClassifier(
 model.fit(X, y)
 
 # ======================
-# VISUALISASI TREE
-# ======================
-st.subheader("🌳 Diagram Decision Tree")
-
-fig, ax = plt.subplots(figsize=(22, 12))
-plot_tree(
-    model,
-    feature_names=X.columns,
-    class_names=model.classes_,
-    filled=True,      # WARNA KUNING AKTIF
-    rounded=True,
-    ax=ax
-)
-st.pyplot(fig)
-
-st.caption("Node berwarna menunjukkan rule (sesuai permintaan dosen)")
-
-# ======================
 # INPUT USER
 # ======================
-st.subheader("🧪 Input Gejala Pasien")
+st.subheader("Masukkan Gejala:")
 
-col1, col2, col3 = st.columns(3)
+suhu = st.checkbox("Suhu tubuh tinggi")
+batuk = st.checkbox("Batuk kering")
+napas = st.checkbox("Gangguan pernapasan")
+anosmia = st.checkbox("Hilang penciuman")
+nyeri = st.checkbox("Nyeri otot")
+kontak = st.checkbox("Riwayat kontak")
 
-with col1:
-    suhu = st.checkbox("Suhu tubuh tinggi")
-    batuk = st.checkbox("Batuk kering")
-
-with col2:
-    napas = st.checkbox("Gangguan pernapasan")
-    anosmia = st.checkbox("Hilang penciuman")
-
-with col3:
-    nyeri = st.checkbox("Nyeri otot")
-    kontak = st.checkbox("Riwayat kontak")
-
-if st.button("🔍 Prediksi COVID-19"):
+if st.button("🔍 Deteksi"):
     data_pasien = pd.DataFrame([{
         'Suhu_Tubuh_Tinggi': int(suhu),
         'Batuk_Kering': int(batuk),
@@ -93,6 +64,6 @@ if st.button("🔍 Prediksi COVID-19"):
     hasil = model.predict(data_pasien)[0]
 
     if hasil == "Positif":
-        st.error("⚠️ Pasien TERINDIKASI COVID-19")
+        st.error("⚠️ TERDETEKSI COVID-19")
     else:
-        st.success("✅ Pasien TIDAK TERINDIKASI COVID-19")
+        st.success("✅ TIDAK TERDETEKSI COVID-19")
